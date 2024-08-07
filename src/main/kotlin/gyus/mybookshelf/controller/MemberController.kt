@@ -2,7 +2,12 @@ package gyus.mybookshelf.controller
 
 import gyus.mybookshelf.model.BaseMember
 import gyus.mybookshelf.model.Member
+import gyus.mybookshelf.model.MemberDTO
 import gyus.mybookshelf.repository.MemberRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -41,8 +46,10 @@ class MemberController(private val memberRepository: MemberRepository) {
     }
 
     @GetMapping("/allMembers")
-    fun allMembers(): List<BaseMember> {
-        return memberRepository.findAll()
+    fun allMembers(): List<MemberDTO> {
+        return memberRepository.findAll().map{
+            MemberDTO.toDto(it)
+        }
     }
 
     @GetMapping("/findByName")
@@ -64,5 +71,13 @@ class MemberController(private val memberRepository: MemberRepository) {
         @RequestParam("email") email:String
     ) : Int {
         return memberRepository.countDistinctByName(email)
+    }
+
+    @GetMapping("/findAllMembersWithPaging")
+    fun findAllMembersWithPaging(@RequestParam("page")page:Int,
+                                 @RequestParam("size")size:Int) :Page<BaseMember>{
+
+        val pageable = PageRequest.of(page, size, Sort.by("id").descending())
+        return memberRepository.findAllMembersWithPaging(pageable)
     }
 }

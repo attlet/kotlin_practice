@@ -22,6 +22,14 @@ abstract class BaseMember(
 //        println(this::class.simpleName) //클래스 이름 출력
         return "User(id : $id, name : $name, email : $email, $createDt, $updateDt)"
     }
+
+    fun fromDto(dto:MemberDTO):BaseMember{
+        return when (this) {
+            is Member -> Member(dto.name, dto.email)
+            is Author -> Author(dto.name, dto.email)
+            else -> throw NotImplementedError("멤버 클래스가 아닙니다.")
+        }
+    }
 }
 
 @Entity
