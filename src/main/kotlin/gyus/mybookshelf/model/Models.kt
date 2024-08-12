@@ -1,5 +1,6 @@
 package gyus.mybookshelf.model
 
+import com.fasterxml.jackson.databind.ser.Serializers.Base
 import jakarta.persistence.*
 import java.time.Instant
 
@@ -45,3 +46,71 @@ class Author(
     name: String,
     email: String,
 ) : BaseMember(name = name, email = email)
+
+@Entity
+class Post(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,   //다른 클래스가 상속을 하는
+    val title:String,
+    val content:String,
+    val isEpisode:Boolean = false,
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    val member:BaseMember,
+    val createdDt:Instant = Instant.now(),
+    val updateDt: Instant = Instant.now()
+) {
+}
+@Entity
+class Episode(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,   //다른 클래스가 상속을 하는
+
+    @OneToOne
+    @JoinColumn(name = "post_id")
+    val post:Post,
+
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    val book:Book? = null
+
+){
+
+}
+@Entity
+class Book(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,   //다른 클래스가 상속을 하는
+    val title:String,
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    val member:BaseMember,
+    val publisher:String = "앤디출판",
+    val createdDt:Instant = Instant.now(),
+    val updateDt: Instant = Instant.now()
+){
+
+}
+@Entity
+class BookShelf(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,   //다른 클래스가 상속을 하는
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    val member:BaseMember,
+
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    val book: Book,
+    val createdDt:Instant = Instant.now(),
+    val updateDt: Instant = Instant.now()
+){
+
+}
